@@ -6,15 +6,17 @@ import shutil
 # AWS credentials and region
 aws_access_key = "YOUR_ACCESS_KEY"
 aws_secret_key = "YOUR_SECRET_KEY"
-region_name = "us-east-1"
+region_name = "us-east-2"
 
 # Initialize CloudWatch Logs client
-client = boto3.client('logs', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key, region_name=region_name)
+client = boto3.client('logs', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key,
+                      region_name=region_name)
 
 # Log group and log stream names
-log_group_name = 'YOUR_LOG_GROUP_NAME'
-log_stream_prefix = 'YOUR_LOG_STREAM_PREFIX'
+log_group_name = 'data-service-queries-group'
+log_stream_prefix = 'data-service-queries-stream'
 download_directory = 'logs/'
+
 
 def download_logs(log_group_name, log_stream_name, start_time, end_time, download_directory):
     # Create download directory if it doesn't exist
@@ -37,6 +39,7 @@ def download_logs(log_group_name, log_stream_name, start_time, end_time, downloa
         with open(log_file_path, 'a') as log_file:
             log_file.write(log_data + '\n')
 
+
 def parse_logs(log_group_name, log_stream_prefix, start_time, download_directory):    
     # List log streams
     response = client.describe_log_streams(
@@ -49,5 +52,6 @@ def parse_logs(log_group_name, log_stream_prefix, start_time, download_directory
         log_stream_name = stream['logStreamName']
         print(f"Downloading logs from {log_stream_name}")
         download_logs(log_group_name, log_stream_name, start_time, int(stream['lastIngestionTime']), download_directory)
+
 
 parse_logs(log_group_name, log_stream_prefix, 0, download_directory)
